@@ -1,0 +1,6 @@
+{
+	"database": "../test-database",
+	"https": true,
+	"cert_key": "../cert.key",
+	"cert_path": "../cert.crt"
+}
