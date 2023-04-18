@@ -214,6 +214,7 @@ body {
 	background: var(--base-colour);
 	border-radius: 0.25em;
 	color: #fff;
+	cursor: pointer;
 	font-family: var(--body-font);
 	font-size: 13pt;
 	padding: 0.4em 1.5em;

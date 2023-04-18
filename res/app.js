@@ -88,7 +88,7 @@ function show_login() {
 			para("Enter your handle and password to continue.") +
 			div("login-panel-handle-0", "textbox-width-restrict", textbox("handle", "Handle")) +
 			div("login-panel-handle-0", "textbox-width-restrict", password("password", "Password")) +
-			para("<a href=\"/login\">Create an account</a>") +
+			para("<a href=\"/create\" in-app>Create an account</a>") +
 			"<div id=\"login-error\"></div><div class=\"login-dialogue-button-container\">" +
 				"<div class=\"login-dialogue-button-container-left\">" +
 					button("action-cancel-login", "Cancel", "window.history.back()", true) +
@@ -101,6 +101,45 @@ function show_login() {
 	);
 }
 
+function show_oops() {
+	var main_view = document.getElementById("app-main");
+	
+	main_view.innerHTML = div("login-main-div", "login-main", div("login-panel", "panel", h1("Oops!") + para("It looks like you're lost! Maybe you want to <a href=\"/login\" in-app>log in</a> or <a href=\"/create\" in-app>create an account</a>?") + para("<button class=\"button secondary\" onclick=\"window.history.back()\">Go back</button>")));
+}
+
+function switch_view(view) {
+	switch (view) {
+		case "login":
+			show_login();
+			break;
+		case "create":
+			break;
+		default:
+			show_oops();
+			break;
+	}
+}
+
+function on_link_clicked(e) {
+	if (e.target.matches("[in-app]")) {
+		e.preventDefault();
+		window.history.pushState(null, "", e.target.href); // Push new history
+		switch_view(e.target.href.slice(1));
+	}
+}
+
+function setup_links() {
+	document.body.addEventListener("click", on_link_clicked);
+}
+
+function setup_history() {
+	window.addEventListener("popstate", (event) => {
+		switch_view(location.pathname.slice(1));
+	});
+}
+
 function main() {
-	show_login();
+	setup_links();
+	setup_history();
+	switch_view(location.pathname.slice(1));
 }
