@@ -261,7 +261,7 @@ class Auth():
 		"""
 		
 		# Validate that handle exists
-		if (not self.handle_db.has(handle)):
+		if (not validate_handle(handle) or not self.handle_db.has(handle)):
 			return {
 				"status": "failed",
 				"message": "Something went wrong! Your username or password might be incorrect.",
@@ -270,7 +270,7 @@ class Auth():
 		uid = self.get_id(handle)
 		
 		# Check password
-		if (not self.check_password(uid, password)):
+		if (not validate_password(password) or not self.check_password(uid, password)):
 			return {
 				"status": "failed",
 				"message": "Something went wrong! Your username or password might be incorrect.",

@@ -86,7 +86,7 @@ class Context:
 		self.request.send_header("Content-Type", contenttype)
 		self.request.send_header("X-Yube-API", "1")
 		self.request.end_headers()
-		self.request.wfile.write(message.encode("utf-8") if (type(data) == str) else message)
+		self.request.wfile.write(message.encode("utf-8") if (type(message) == str) else message)
 		
 		raise ContextFinished()
 	
