@@ -288,8 +288,9 @@ class Auth():
 		return {
 			"status": "done",
 			"message": "You have been logged in!",
-			"tf_required": False,
-			"tf_id": None,
+			"mfa_required": False,
+			"mfa_next": None,
+			"mfa_id": None,
 			"token": token,
 			"key": key,
 		}
@@ -313,4 +314,25 @@ class Auth():
 		return {
 			"status": "done",
 			"message": "You have been logged out successfully.",
+		}
+	
+	def validate_token(self, token, key):
+		"""
+		Validate a token give it's name and key
+		"""
+		
+		token_id = token
+		token = self.get_valid_token(token, key)
+		
+		if (not token):
+			return {
+				"status": "bad_token",
+				"message": "Your session token is not valid.",
+				"valid": False,
+			}
+		
+		return {
+			"status": "done",
+			"message": "The session token is valid!",
+			"valid": True,
 		}

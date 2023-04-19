@@ -41,6 +41,16 @@ function request(method, url, body, handler) {
 	xhr.send(body);
 }
 
+function get_param(target) {
+	let params = new URLSearchParams();
+	
+	for (const [key, value] of params.entries()) {
+		if (key == target) {
+			return value;
+		}
+	}
+}
+
 /**
  * Login
  */
@@ -60,7 +70,12 @@ function handle_login_response() {
 			return;
 		}
 		
-		show_error(this.responseText, "done");
+		// Save them for dashboard
+		window.localStorage.setItem("token", result["token"]);
+		window.localStorage.setItem("key", result["key"]);
+		
+		//show_error(this.responseText, "done");
+		update_view("/dash/home");
 	}
 }
 
@@ -107,6 +122,55 @@ function do_create_request() {
 	
 	request("POST", "/api/user/create", JSON.stringify(data), handle_create_response);
 }
+
+function handle_validate_response() {
+	if (this.readyState == 4) {
+		let result = JSON.parse(this.responseText);
+		let status = result["status"];
+		
+		if (status["valid"] == false) {
+			update_view("/login");
+		}
+	}
+}
+
+function do_validate_request() {
+	let token = window.localStorage.getItem("token");
+	let key = window.localStorage.getItem("key");
+	
+	let data = {
+		token: token,
+		key: key
+	}
+	
+	request("POST", "/api/token/validate", JSON.stringify(data), handle_validate_response);
+}
+
+function handle_validate_response() {
+	if (this.readyState == 4) {
+		let result = JSON.parse(this.responseText);
+		let status = result["status"];
+		
+		if (status["valid"] == false) {
+			update_view("/login");
+		}
+	}
+}
+
+function do_pre_grant_info() {
+	
+	
+	let token = window.localStorage.getItem("token");
+	let key = window.localStorage.getItem("key");
+	
+	let data = {
+		token: token,
+		key: key
+	}
+	
+	request("POST", "/api/token/validate", JSON.stringify(data), handle_validate_response);
+}
+
 
 /**
  * User interface
@@ -170,10 +234,16 @@ function show_congrats() {
 	main_view.innerHTML = div("login-main-div", "login-main", div("login-panel", "panel", h1("Dashboard") + para("The user dashboard is empty right now.") + para("<a href=\"/login\" in-app><button class=\"button secondary\">Log in</button></a>")));
 }
 
-function show_dash() {
+function show_dash_home() {
 	var main_view = document.getElementById("app-main");
 	
-	main_view.innerHTML = div("login-main-div", "login-main", div("login-panel", "panel", h1("Welcome!") + para("Your account has been created! You can now log in to it.")));
+	main_view.innerHTML = div("login-main-div", "login-main", div("login-panel", "panel", h1("Welcome!") + para("This is the dashboard that doesn't yet exist!")));
+}
+
+function show_grant() {
+	var main_view = document.getElementById("app-main");
+	
+	main_view.innerHTML = div("login-main-div", "login-main", div("login-panel", "panel", h1("Grant access?") + "<div id=\"grant-info\"></div>"));
 }
 
 function switch_view(view) {
@@ -184,8 +254,11 @@ function switch_view(view) {
 		case "create":
 			show_create();
 			break;
-		case "dash":
-			show_dash();
+		case "grant":
+			show_grant();
+			break;
+		case "dash/home":
+			show_dash_home();
 			break;
 		default:
 			show_oops();
@@ -221,4 +294,5 @@ function main() {
 	setup_links();
 	setup_history();
 	switch_view(location.pathname.slice(1));
+	do_validate_request();
 }

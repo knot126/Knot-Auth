@@ -3,7 +3,7 @@ import importlib.util
 import sys
 import random
 import json
-import time
+import time as time_m
 import os
 import pathlib
 
@@ -178,7 +178,7 @@ def parse_path(path):
 	return (path, params)
 
 def time():
-	return int(time.time())
+	return int(time_m.time())
 
 def load_binary(path):
 	return pathlib.Path(path).read_bytes()
