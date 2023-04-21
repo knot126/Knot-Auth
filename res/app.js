@@ -162,6 +162,9 @@ function handle_app_info_response() {
 		let result = JSON.parse(this.responseText);
 		let app_info = document.getElementById("grant-info");
 		
+		window.kaui_method = result["auth_mode"];
+		window.kaui_url = result["auth_url"];
+		
 		app_info.innerHTML = "<p>This will give <b>" + result["title"] + "</b> access to:</p><ul>";
 		
 		for (let i = 0; i < result["areas"].length; i++) {
@@ -175,7 +178,7 @@ function handle_app_info_response() {
 			app_info.innerHTML += "<li>" + item + "</li>";
 		}
 		
-		app_info.innerHTML += "</ul><p>This app will also become assocaited with your account until you remove it. Please keep in mind that we sometimes suspend users assocaited with serverices that break our Terms of Service or ethical guidelines.</p>";
+		app_info.innerHTML += "</ul><p>This app will also become assocaited with your account until you remove it. Please keep in mind that we sometimes suspend users assocaited with serverices that break our Terms of Service or ethical guidelines, so be sure this is a service you want to be assocaited with.</p>";
 	}
 }
 
@@ -192,6 +195,28 @@ function do_app_info_request() {
 	request("POST", "/api/app/info", JSON.stringify(data), handle_app_info_response);
 }
 
+function handle_grant_response() {
+	if (this.readyState == 4) {
+		let result = JSON.parse(this.responseText);
+		
+		if (result["status"] == "done") {
+			window.location = window.kaui_url.replaceAll("{grant_id}", result["grant_id"]).replaceAll("{grant_key}", result["grant_key"]);
+		}
+	}
+}
+
+function do_grant_request() {
+	let token = window.localStorage.getItem("token");
+	let key = window.localStorage.getItem("key");
+	
+	let data = {
+		token: token,
+		key: key,
+		app_id: token,
+	}
+	
+	request("POST", "/api/grant/create", JSON.stringify(data), handle_grant_response);
+}
 
 /**
  * User interface
