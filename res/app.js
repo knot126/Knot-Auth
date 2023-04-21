@@ -143,7 +143,7 @@ function do_validate_request() {
 		key: key
 	}
 	
-	request("POST", "/api/token/validate", JSON.stringify(data), handle_validate_response);
+	request("POST", "/api/user/identify", JSON.stringify(data), handle_validate_response);
 }
 
 function handle_validate_response() {
@@ -157,18 +157,39 @@ function handle_validate_response() {
 	}
 }
 
-function do_pre_grant_info() {
-	
-	
+function handle_app_info_response() {
+	if (this.readyState == 4) {
+		let result = JSON.parse(this.responseText);
+		let app_info = document.getElementById("grant-info");
+		
+		app_info.innerHTML = "<p>This will give <b>" + result["title"] + "</b> access to:</p><ul>";
+		
+		for (let i = 0; i < result["areas"].length; i++) {
+			let item = "unknown";
+			
+			switch (result["areas"][i]) {
+				case "userinfo": item = "Basic user info";
+				default: break;
+			}
+			
+			app_info.innerHTML += "<li>" + item + "</li>";
+		}
+		
+		app_info.innerHTML += "</ul><p>This app will also become assocaited with your account until you remove it.</p>";
+	}
+}
+
+function do_app_info_request() {
 	let token = window.localStorage.getItem("token");
 	let key = window.localStorage.getItem("key");
 	
 	let data = {
 		token: token,
-		key: key
+		key: key,
+		app_id: token,
 	}
 	
-	request("POST", "/api/token/validate", JSON.stringify(data), handle_validate_response);
+	request("POST", "/api/app/info", JSON.stringify(data), handle_app_info_response);
 }
 
 
@@ -243,7 +264,18 @@ function show_dash_home() {
 function show_grant() {
 	var main_view = document.getElementById("app-main");
 	
-	main_view.innerHTML = div("login-main-div", "login-main", div("login-panel", "panel", h1("Grant access?") + "<div id=\"grant-info\"></div>"));
+	main_view.innerHTML = div("login-main-div", "login-main", div("login-panel", "panel", h1("Grant access?") + "<div id=\"grant-info\"></div>" + 
+	"<div id=\"login-error\"></div><div class=\"login-dialogue-button-container\">" +
+		"<div class=\"login-dialogue-button-container-left\">" +
+			button("action-cancel-grant", "Cancel", "window.history.back()", true) +
+		"</div>" +
+		"<div class=\"login-dialogue-button-container-right\">" +
+			button("action-submit-grant", "Grant access", "do_grant_request()") +
+		"</div>" +
+	"</div>"));
+	
+	// Load app info
+	do_app_info_request();
 }
 
 function switch_view(view) {

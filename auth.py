@@ -1,3 +1,7 @@
+"""
+Old auth stuff
+"""
+
 from database import DatabaseFolder
 import secrets, hashlib
 import time
@@ -87,6 +91,15 @@ class Auth():
 		self.handle_db.write(handle, {"user_id": uid})
 		
 		return uid
+	
+	def get_handle(self, uid):
+		"""
+		Get user handle from id
+		"""
+		
+		user = self.user_db.read(uid)
+		
+		return user["handle"]
 	
 	def generate_token(self, uid, *, areas = ["webbasic"], expire = 2419200, extra = None):
 		"""
@@ -329,10 +342,16 @@ class Auth():
 				"status": "bad_token",
 				"message": "Your session token is not valid.",
 				"valid": False,
+				"user_id": None,
+				"handle": None,
+				"expire": 0,
 			}
 		
 		return {
 			"status": "done",
 			"message": "The session token is valid!",
 			"valid": True,
+			"user_id": token["uid"],
+			"handle": self.get_handle(token["uid"]),
+			"expire": token["expire"],
 		}

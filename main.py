@@ -82,7 +82,7 @@ class YuHandler(BaseHTTPRequestHandler):
 		call_endpoint(self, "POST")
 
 def main():
-	print("Yube Server 0.0.1")
+	print("Basic test server")
 	
 	server = ThreadingHTTPServer(('0.0.0.0', 8000), YuHandler)
 	
