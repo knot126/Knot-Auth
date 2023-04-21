@@ -175,7 +175,7 @@ function handle_app_info_response() {
 			app_info.innerHTML += "<li>" + item + "</li>";
 		}
 		
-		app_info.innerHTML += "</ul><p>This app will also become assocaited with your account until you remove it.</p>";
+		app_info.innerHTML += "</ul><p>This app will also become assocaited with your account until you remove it. Please keep in mind that we sometimes suspend users assocaited with serverices that break our Terms of Service or ethical guidelines.</p>";
 	}
 }
 
